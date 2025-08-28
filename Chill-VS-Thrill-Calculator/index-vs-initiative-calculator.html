@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index vs Initiative Calculator</title>
+    <meta name="description" content="Compare S&P 500 investment returns with your business venture potential. Make data-driven investment decisions with our comprehensive calculator tool.">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        
+        .header p {
+            font-size: 1.125rem;
+            color: #64748b;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #0f172a;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-prefix {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        
+        .input-suffix {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        
+        .input-prefix + .form-input {
+            padding-left: 32px;
+        }
+        
+        .form-input:has(+ .input-suffix) {
+            padding-right: 32px;
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        
+        .toggle-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        .toggle-btn:hover:not(.active) {
+            background: #f8fafc;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .calculate-btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .results {
+            margin-top: 32px;
+        }
+        
+        .comparison-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .comparison-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .comparison-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+        
+        .comparison-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        
+        .comparison-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        
+        .comparison-profit {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #10b981;
+        }
+        
+        .comparison-profit.negative {
+            color: #ef4444;
+        }
+        
+        .recommendation {
+            background: linear-gradient(to right, #dbeafe, #e0e7ff);
+            border: 1px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .recommendation h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation p {
+            color: #374151;
+            line-height: 1.6;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+        
+        .chart-container h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+        
+        .chart-wrapper {
+            height: 400px;
+            position: relative;
+        }
+        
+        .chart-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .chart-toggle button {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        
+        .chart-toggle button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        .chart-toggle button:hover:not(.active) {
+            background: #f8fafc;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .table th {
+            text-align: left;
+            padding: 12px 8px;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .table td {
+            padding: 12px 8px;
+            color: #374151;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .table tr.highlight {
+            background-color: #f8fafc;
+        }
+        
+        .table td.bold {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .table td.success {
+            color: #10b981;
+        }
+        
+        .table td.danger {
+            color: #ef4444;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.75rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            background: #64748b;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: help;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Index vs Initiative Calculator</h1>
+            <p>Compare S&P 500 returns with your business venture potential</p>
+        </div>
+        
+        <div class="grid">
+            <div>
+                <!-- Business Parameters -->
+                <div class="card">
+                    <h2>Business Parameters</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="businessIdea">Business Idea</label>
+                        <input type="text" id="businessIdea" class="form-input" value="SaaS Product" placeholder="e.g., SaaS Product, E-commerce Store, Consulting">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="investmentAmount">Total Investment Amount ($)</label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="investmentAmount" class="form-input" value="100000" step="1000" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="businessProfit">Estimated Net Operating Income ($)</label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="businessProfit" class="form-input" value="75000" step="1000" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="businessGrowthRate">Estimated Annual Growth (%)</label>
+                        <div class="input-group">
+                            <input type="number" id="businessGrowthRate" class="form-input" value="5" step="0.1" min="0" max="100">
+                            <span class="input-suffix">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="timeCommitment">Time Commitment (Hours/Week)</label>
+                        <input type="number" id="timeCommitment" class="form-input" value="40" step="1" min="0" max="168">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="costPerHour">
+                            Your Time Value ($/Hour)
+                            <span class="tooltip">
+                                <span class="info-icon">i</span>
+                                <span class="tooltiptext">What you could earn elsewhere or your opportunity cost</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="costPerHour" class="form-input" value="50" step="1" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="mentalEffort">Mental Effort & Stress Level</label>
+                        <select id="mentalEffort" class="form-select">
+                            <option value="high">High - Significant stress and mental resources</option>
+                            <option value="medium" selected>Medium - Moderate stress and effort</option>
+                            <option value="low">Low - Minimal stress and mental load</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="duration">Time Horizon (Years)</label>
+                        <input type="number" id="duration" class="form-input" value="10" step="1" min="1" max="50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Potential Exit Value
+                            <span class="tooltip">
+                                <span class="info-icon">i</span>
+                                <span class="tooltiptext">Configure exit value as revenue multiplier or fixed cash amount</span>
+                            </span>
+                        </label>
+                        
+                        <div class="toggle-buttons">
+                            <button type="button" class="toggle-btn active" id="multiplierBtn" onclick="setExitType('multiplier')">
+                                Multiplier
+                            </button>
+                            <button type="button" class="toggle-btn" id="cashBtn" onclick="setExitType('cash')">
+                                Cash Amount
+                            </button>
+                        </div>
+                        
+                        <div id="multiplierInput" class="input-group">
+                            <input type="number" id="exitMultiplier" class="form-input" value="3" step="0.1" min="0" max="20" placeholder="Revenue multiplier">
+                            <span class="input-suffix">x</span>
+                        </div>
+                        
+                        <div id="cashInput" class="input-group" style="display: none;">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="exitCashAmount" class="form-input" value="1000000" step="10000" min="0" placeholder="Exit cash amount">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Investment Parameters -->
+                <div class="card" style="margin-top: 24px;">
+                    <h2>Investment Parameters</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="sp500Return">
+                            S&P 500 Annual Return Average (%)
+                            <span class="tooltip">
+                                <span class="info-icon">i</span>
+                                <span class="tooltiptext">Historical average with dividends reinvested</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" id="sp500Return" class="form-input" value="10.5" step="0.1" min="0" max="50">
+                            <span class="input-suffix">%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="calculate-btn" onclick="calculateResults()" style="margin-top: 24px;">
+                    Calculate & Compare Returns
+                </button>
+            </div>
+            
+            <div id="results" class="results" style="display: none;">
+                <!-- Comparison Cards -->
+                <div class="comparison-cards">
+                    <div class="comparison-card">
+                        <h3>S&P 500 Investment</h3>
+                        <div class="comparison-value" id="sp500Value">$0</div>
+                        <div class="comparison-label">Total Return</div>
+                        <div class="comparison-profit" id="sp500Profit">+$0</div>
+                        <div class="comparison-label">Net Profit</div>
+                    </div>
+                    
+                    <div class="comparison-card">
+                        <h3 id="businessTitle">Business Initiative</h3>
+                        <div class="comparison-value" id="businessValue">$0</div>
+                        <div class="comparison-label">Total Revenue</div>
+                        <div class="comparison-profit" id="businessProfit">$0</div>
+                        <div class="comparison-label">True Net Profit</div>
+                    </div>
+                    
+                    <div class="comparison-card">
+                        <h3>Exit Scenario</h3>
+                        <div class="comparison-value" id="exitValue">$0</div>
+                        <div class="comparison-label" id="exitLabel">Exit Value (3x Revenue)</div>
+                        <div class="comparison-profit" id="exitProfit">+$0</div>
+                        <div class="comparison-label">Net Profit</div>
+                    </div>
+                </div>
+                
+                <!-- Recommendation -->
+                <div class="recommendation">
+                    <h3>Recommendation</h3>
+                    <p id="recommendationText"></p>
+                </div>
+                
+                <!-- Chart -->
+                <div class="chart-container">
+                    <h3>Returns Comparison</h3>
+                    <div class="chart-toggle">
+                        <button onclick="setChartType('bar')" id="barChartBtn" class="active">Total Comparison</button>
+                        <button onclick="setChartType('line')" id="lineChartBtn">Yearly Trend</button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Detailed Table -->
+                <div class="table-container">
+                    <h3>Detailed Breakdown</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th style="text-align: right;">S&P 500</th>
+                                <th style="text-align: right;">Business</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        let currentExitType = 'multiplier';
+        let currentChartType = 'bar';
+        let currentResults = null;
+        
+        function formatCurrency(amount, showSign = false) {
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(Math.abs(amount));
+            
+            if (showSign && amount < 0) {
+                return '-' + formatted;
+            }
+            return formatted;
+        }
+        
+        function setExitType(type) {
+            currentExitType = type;
+            const multiplierBtn = document.getElementById('multiplierBtn');
+            const cashBtn = document.getElementById('cashBtn');
+            const multiplierInput = document.getElementById('multiplierInput');
+            const cashInput = document.getElementById('cashInput');
+            
+            if (type === 'multiplier') {
+                multiplierBtn.classList.add('active');
+                cashBtn.classList.remove('active');
+                multiplierInput.style.display = 'block';
+                cashInput.style.display = 'none';
+            } else {
+                multiplierBtn.classList.remove('active');
+                cashBtn.classList.add('active');
+                multiplierInput.style.display = 'none';
+                cashInput.style.display = 'block';
+            }
+            
+            if (currentResults) {
+                calculateResults();
+            }
+        }
+        
+        function setChartType(type) {
+            currentChartType = type;
+            const barBtn = document.getElementById('barChartBtn');
+            const lineBtn = document.getElementById('lineChartBtn');
+            
+            if (type === 'bar') {
+                barBtn.classList.add('active');
+                lineBtn.classList.remove('active');
+            } else {
+                barBtn.classList.remove('active');
+                lineBtn.classList.add('active');
+            }
+            
+            if (currentResults) {
+                updateChart(currentResults);
+            }
+        }
+        
+        function calculateReturns() {
+            const inputs = {
+                businessIdea: document.getElementById('businessIdea').value,
+                sp500Return: parseFloat(document.getElementById('sp500Return').value) || 0,
+                investmentAmount: parseFloat(document.getElementById('investmentAmount').value) || 0,
+                duration: parseInt(document.getElementById('duration').value) || 0,
+                businessProfit: parseFloat(document.getElementById('businessProfit').value) || 0,
+                businessGrowthRate: parseFloat(document.getElementById('businessGrowthRate').value) || 0,
+                exitType: currentExitType,
+                exitMultiplier: parseFloat(document.getElementById('exitMultiplier').value) || 0,
+                exitCashAmount: parseFloat(document.getElementById('exitCashAmount').value) || 0,
+                timeCommitment: parseFloat(document.getElementById('timeCommitment').value) || 0,
+                costPerHour: parseFloat(document.getElementById('costPerHour').value) || 0,
+                mentalEffort: document.getElementById('mentalEffort').value
+            };
+            
+            // S&P 500 calculations
+            const sp500FinalValue = inputs.investmentAmount * Math.pow(1 + (inputs.sp500Return / 100), inputs.duration);
+            const sp500Profit = sp500FinalValue - inputs.investmentAmount;
+            const sp500AnnualReturn = inputs.investmentAmount * (inputs.sp500Return / 100);
+            
+            // Business calculations
+            const annualTimeCost = inputs.timeCommitment * 52 * inputs.costPerHour;
+            const stressMultipliers = { low: 0.05, medium: 0.10, high: 0.20 };
+            const stressAdjustment = inputs.businessProfit * stressMultipliers[inputs.mentalEffort];
+            
+            let businessTotalRevenue = 0;
+            let businessTotalProfit = 0;
+            const yearlyData = [];
+            let cumulativeBusinessProfit = 0;
+            
+            for (let year = 0; year < inputs.duration; year++) {
+                const yearlyProfit = inputs.businessProfit * Math.pow(1 + (inputs.businessGrowthRate / 100), year);
+                const yearlyStressAdjustment = yearlyProfit * stressMultipliers[inputs.mentalEffort];
+                const trueYearlyProfit = yearlyProfit - annualTimeCost - yearlyStressAdjustment;
+                
+                businessTotalRevenue += yearlyProfit;
+                businessTotalProfit += trueYearlyProfit;
+                cumulativeBusinessProfit += trueYearlyProfit;
+                
+                const sp500ValueAtYear = inputs.investmentAmount * Math.pow(1 + (inputs.sp500Return / 100), year + 1);
+                const businessValueAtYear = inputs.investmentAmount + cumulativeBusinessProfit;
+                const cumulativeRevenue = businessTotalRevenue;
+                
+                yearlyData.push({
+                    year: year + 1,
+                    sp500Value: sp500ValueAtYear,
+                    businessValue: businessValueAtYear,
+                    businessExitValue: inputs.exitType === 'multiplier' 
+                        ? cumulativeRevenue * inputs.exitMultiplier 
+                        : inputs.exitCashAmount
+                });
+            }
+            
+            const businessFinalValue = inputs.investmentAmount + businessTotalProfit;
+            const businessExitValue = inputs.exitType === 'multiplier' 
+                ? businessTotalRevenue * inputs.exitMultiplier 
+                : inputs.exitCashAmount;
+            const trueAnnualBusinessProfit = businessTotalProfit / inputs.duration;
+            
+            return {
+                sp500FinalValue,
+                sp500Profit,
+                sp500AnnualReturn,
+                businessTotalRevenue,
+                businessTotalProfit,
+                businessFinalValue,
+                businessExitValue,
+                annualTimeCost,
+                stressAdjustment,
+                trueAnnualBusinessProfit,
+                yearlyData,
+                inputs
+            };
+        }
+        
+        function updateChart(results) {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            if (currentChartType === 'bar') {
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['S&P 500 Investment', results.inputs.businessIdea || 'Business Initiative', 'Exit Scenario'],
+                        datasets: [{
+                            label: 'Total Return',
+                            data: [results.sp500FinalValue, results.businessFinalValue, results.businessExitValue],
+                            backgroundColor: ['#2563EB', '#10B981', '#F59E0B'],
+                            borderColor: ['#1D4ED8', '#059669', '#D97706'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return formatCurrency(context.parsed.y);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: results.yearlyData.map(d => `Year ${d.year}`),
+                        datasets: [
+                            {
+                                label: 'S&P 500',
+                                data: results.yearlyData.map(d => d.sp500Value),
+                                borderColor: '#2563EB',
+                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: results.inputs.businessIdea || 'Business Initiative',
+                                data: results.yearlyData.map(d => d.businessValue),
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Exit Scenario',
+                                data: results.yearlyData.map(d => d.businessExitValue),
+                                borderColor: '#F59E0B',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time Period'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function calculateResults() {
+            const results = calculateReturns();
+            currentResults = results;
+            
+            // Update comparison cards
+            document.getElementById('sp500Value').textContent = formatCurrency(results.sp500FinalValue);
+            document.getElementById('sp500Profit').textContent = '+' + formatCurrency(results.sp500Profit);
+            
+            document.getElementById('businessTitle').textContent = results.inputs.businessIdea || 'Business Initiative';
+            document.getElementById('businessValue').textContent = formatCurrency(results.businessTotalRevenue);
+            const businessProfitEl = document.getElementById('businessProfit');
+            businessProfitEl.textContent = formatCurrency(results.businessTotalProfit, true);
+            businessProfitEl.className = 'comparison-profit ' + (results.businessTotalProfit >= 0 ? '' : 'negative');
+            
+            document.getElementById('exitValue').textContent = formatCurrency(results.businessExitValue);
+            document.getElementById('exitLabel').textContent = results.inputs.exitType === 'multiplier' 
+                ? `Exit Value (${results.inputs.exitMultiplier}x Revenue)` 
+                : 'Exit Value (Fixed Amount)';
+            document.getElementById('exitProfit').textContent = '+' + formatCurrency(results.businessExitValue - results.inputs.investmentAmount);
+            
+            // Update recommendation
+            const difference = Math.abs(results.sp500FinalValue - results.businessFinalValue);
+            const percentDifference = (difference / Math.max(results.sp500FinalValue, results.businessFinalValue) * 100).toFixed(1);
+            
+            let recommendationText;
+            if (results.sp500FinalValue > results.businessFinalValue) {
+                recommendationText = `Based on your inputs, <strong>S&P 500 investment appears more favorable</strong> by ${formatCurrency(difference)} (${percentDifference}% better). The business initiative shows lower returns when accounting for opportunity costs and stress factors.`;
+            } else {
+                recommendationText = `Based on your inputs, <strong>the business initiative appears more favorable</strong> by ${formatCurrency(difference)} (${percentDifference}% better). However, consider the additional risks and uncertainties of business ownership.`;
+            }
+            
+            document.getElementById('recommendationText').innerHTML = recommendationText;
+            
+            // Update table
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td>Initial Investment</td>
+                    <td style="text-align: right;">${formatCurrency(results.inputs.investmentAmount)}</td>
+                    <td style="text-align: right;">${formatCurrency(results.inputs.investmentAmount)}</td>
+                </tr>
+                <tr>
+                    <td>Annual Revenue</td>
+                    <td style="text-align: right;">${formatCurrency(results.sp500AnnualReturn)}</td>
+                    <td style="text-align: right;">${formatCurrency(results.inputs.businessProfit)}</td>
+                </tr>
+                <tr>
+                    <td>Time Cost (Annual)</td>
+                    <td style="text-align: right;">$0</td>
+                    <td style="text-align: right;">-${formatCurrency(results.annualTimeCost)}</td>
+                </tr>
+                <tr>
+                    <td>Stress Adjustment</td>
+                    <td style="text-align: right;">$0</td>
+                    <td style="text-align: right;">-${formatCurrency(results.stressAdjustment)}</td>
+                </tr>
+                <tr class="highlight">
+                    <td class="bold">True Annual Profit</td>
+                    <td class="bold" style="text-align: right;">${formatCurrency(results.sp500AnnualReturn)}</td>
+                    <td class="bold ${results.trueAnnualBusinessProfit >= 0 ? 'success' : 'danger'}" style="text-align: right;">${formatCurrency(results.trueAnnualBusinessProfit, true)}</td>
+                </tr>
+                <tr class="highlight">
+                    <td class="bold">${results.inputs.duration}-Year Total</td>
+                    <td class="bold success" style="text-align: right;">${formatCurrency(results.sp500FinalValue)}</td>
+                    <td class="bold ${results.businessFinalValue >= 0 ? 'success' : 'danger'}" style="text-align: right;">${formatCurrency(results.businessFinalValue, true)}</td>
+                </tr>
+            `;
+            
+            // Update chart
+            updateChart(results);
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        // Auto-calculate on input changes
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('input, select')) {
+                if (document.getElementById('results').style.display !== 'none') {
+                    calculateResults();
+                }
+            }
+        });
+        
+        // Initial calculation
+        calculateResults();
+    </script>
+</body>
+</html>
